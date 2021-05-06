@@ -10,7 +10,7 @@ pub struct SwatchInternetTime {
 impl From<DateTime<Utc>> for SwatchInternetTime {
     fn from(dt: DateTime<Utc>) -> Self {
         let time = dt.with_timezone(&FixedOffset::east(3600)).time();
-        let beat = (((time.minute() * 60) as f64 + (time.hour() * 3600) as f64) / 86.4).ceil() as u32;
+        let beat = (((time.minute() * 60) as f64 + (time.hour() * 3600) as f64 + time.second() as f64) / 86.4).floor() as u32;
         SwatchInternetTime {
             beat
         }
