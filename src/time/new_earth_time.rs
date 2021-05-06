@@ -1,5 +1,6 @@
 use chrono::prelude::*;
 use num_integer::Integer;
+use std::fmt;
 
 #[derive(Debug)]
 pub struct NewEarthTime {
@@ -33,6 +34,12 @@ impl From<NewEarthTime> for NaiveTime {
     }
 }
 
+impl fmt::Display for NewEarthTime {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:03}° {:02}′ {:02}″", self.degree, self.minute, self.second)
+    }
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -56,7 +63,7 @@ mod tests {
     }
 
     #[test]
-    fn cozette_handshake_is_4_72_91() {
+    fn cozette_handshake_is_170_15_0() {
         let handshake: NewEarthTime = Utc.ymd(1970, 1, 1).and_hms(11, 21, 0).into();
         assert_eq!(handshake.degree, 170);
         assert_eq!(handshake.minute, 15);

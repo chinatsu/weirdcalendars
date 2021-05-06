@@ -1,5 +1,6 @@
 use chrono::prelude::*;
 use num_integer::Integer;
+use std::fmt;
 
 #[derive(Debug)]
 pub struct DecimalTime {
@@ -29,6 +30,12 @@ impl From<DecimalTime> for NaiveTime {
         let (prelim_minute, second) = total_seconds.div_rem(&60);
         let (hour, minute) = prelim_minute.div_rem(&60);
         NaiveTime::from_hms(hour, minute, second)
+    }
+}
+
+impl fmt::Display for DecimalTime {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:02}h {:02}m {:02}s", self.hour, self.minute, self.second)
     }
 }
 

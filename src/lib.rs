@@ -1,11 +1,11 @@
-mod decimal_time;
-mod new_earth_time;
+mod time;
+pub use time::{decimal_time::DecimalTime, new_earth_time::NewEarthTime, swatch_internet_time::SwatchInternetTime};
 
 #[cfg(test)]
 mod tests {
     use chrono::prelude::*;
-    use crate::decimal_time::DecimalTime;
-    use crate::new_earth_time::NewEarthTime;
+    use crate::DecimalTime;
+    use crate::NewEarthTime;
     #[test]
     fn decimal_time_to_new_earth_time() {
         let utcnow = Utc::now();
