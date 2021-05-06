@@ -1,12 +1,20 @@
 use chrono::prelude::*;
 use num_integer::Integer;
 use std::fmt;
+use super::Time;
 
 #[derive(Debug)]
 pub struct NewEarthTime {
     degree: u32,
     minute: u32,
     second: u32
+}
+
+impl Time<NewEarthTime> for NewEarthTime {
+    fn now() -> Self {
+        let naive_now = Utc::now();
+        naive_now.into()
+    }
 }
 
 impl From<DateTime<Utc>> for NewEarthTime {
@@ -30,7 +38,7 @@ impl From<NewEarthTime> for NaiveTime {
         let total_seconds = total_net_seconds / 15;
         let (prelim_minute, second) = total_seconds.div_rem(&60);
         let (hour, minute) = prelim_minute.div_rem(&60);
-        NaiveTime::from_hms(hour, minute, second)
+        NaiveTime::from_hms(hour as u32, minute as u32, second as u32)
     }
 }
 

@@ -1,16 +1,13 @@
 use std::{thread, time};
-use weirdcalendars::{DecimalTime, SwatchInternetTime, NewEarthTime};
+use weirdcalendars::{DecimalTime, SwatchInternetTime, NewEarthTime, Time};
 use chrono::prelude::*;
 
 pub fn main() {
     let duration = time::Duration::from_millis(1);
     loop {
-        let utcnow = Utc::now();
-        let localnow = Local::now();
-
-        let net: NewEarthTime = utcnow.into();
-        let beats: SwatchInternetTime = utcnow.into();
-        let vive_la_revolution: DecimalTime = localnow.time().into();
+        let net = NewEarthTime::now();
+        let beats = SwatchInternetTime::now();
+        let vive_la_revolution = DecimalTime::now();
 
         print!("{}\t", net);
         print!("{}\t", beats);

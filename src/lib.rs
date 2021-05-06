@@ -1,5 +1,5 @@
 mod time;
-pub use time::{decimal_time::DecimalTime, new_earth_time::NewEarthTime, swatch_internet_time::SwatchInternetTime};
+pub use time::{decimal_time::DecimalTime, new_earth_time::NewEarthTime, swatch_internet_time::SwatchInternetTime, Time};
 
 #[cfg(test)]
 mod tests {

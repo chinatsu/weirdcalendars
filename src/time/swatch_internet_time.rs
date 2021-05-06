@@ -1,10 +1,18 @@
 use chrono::prelude::*;
 use num_integer::Integer;
 use std::fmt;
+use super::Time;
 
 #[derive(Debug)]
 pub struct SwatchInternetTime {
     beat: u32
+}
+
+impl Time<SwatchInternetTime> for SwatchInternetTime {
+    fn now() -> Self {
+        let naive_now = Utc::now();
+        naive_now.into()
+    }
 }
 
 impl From<DateTime<Utc>> for SwatchInternetTime {
@@ -23,7 +31,7 @@ impl From<SwatchInternetTime> for NaiveTime {
         println!("{}", total_seconds);
         let (prelim_minutes, second) = total_seconds.div_rem(&60);
         let (hour, minute) = prelim_minutes.div_rem(&60);
-        NaiveTime::from_hms(hour, minute, second)
+        NaiveTime::from_hms(hour as u32, minute as u32, second as u32)
     }
 }
 
