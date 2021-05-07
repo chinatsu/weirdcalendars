@@ -7,7 +7,8 @@ use super::Time;
 pub struct DecimalTime {
     hour: u32,
     minute: u32,
-    second: u32
+    second: u32,
+    milli: u32
 }
 
 impl Time<DecimalTime> for DecimalTime {
@@ -19,31 +20,36 @@ impl Time<DecimalTime> for DecimalTime {
 
 impl From<NaiveTime> for DecimalTime {
     fn from(time: NaiveTime) -> Self {
-        let total_seconds = time.hour() * 3600 + time.minute() * 60 + time.second();
-        let total_decimal_seconds: u32 = (total_seconds as f64 / 0.864) as u32;
-        let (prelim_minutes, decimal_seconds) = total_decimal_seconds.div_rem(&100);
+        let total_decimal_subseconds = (
+            (time.hour() as u64 * 360000000) + 
+            (time.minute() as u64 * 6000000) + 
+            (time.second() as u64 * 100000) + 
+            (time.nanosecond() as u64 / 10000)) as u32 
+            / 864 * 10;
+        let (prelim_seconds, decimal_millis) = total_decimal_subseconds.div_rem(&1000);
+        let (prelim_minutes, decimal_seconds) = prelim_seconds.div_rem(&100);
         let (decimal_hours, decimal_minutes) = prelim_minutes.div_rem(&100);
         DecimalTime {
             hour: decimal_hours,
             minute: decimal_minutes,
-            second: decimal_seconds
+            second: decimal_seconds,
+            milli: decimal_millis / 10
         }
     }
 }
 
 impl From<DecimalTime> for NaiveTime {
     fn from(dt: DecimalTime) -> Self {
-        let total_dt_seconds = dt.hour * 10000 + dt.minute * 100 + dt.second;
-        let total_seconds = (total_dt_seconds as f64 * 0.864).ceil() as u32;
-        let (prelim_minute, second) = total_seconds.div_rem(&60);
-        let (hour, minute) = prelim_minute.div_rem(&60);
-        NaiveTime::from_hms(hour, minute, second)
+        let total_dt_millis = dt.hour * 10000000 + dt.minute * 100000 + dt.second * 1000 + dt.milli;
+        let total_millis = (total_dt_millis as f64 * 0.864).ceil() as u32;
+        let (seconds, millis) = total_millis.div_rem(&1000);
+        NaiveTime::from_num_seconds_from_midnight(seconds, millis*100000)
     }
 }
 
 impl fmt::Display for DecimalTime {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{:02}h {:02}m {:02}s", self.hour, self.minute, self.second)
+        write!(f, "{:01}h {:02}m {:02}.{:02}s", self.hour, self.minute, self.second, self.milli)
     }
 }
 

@@ -20,10 +20,10 @@ impl From<DateTime<Utc>> for SwatchInternetTime {
     fn from(dt: DateTime<Utc>) -> Self {
         let time = dt.with_timezone(&FixedOffset::east(3600)).time();
         let total_subbeats = (
-            (time.hour() * 36000000) + 
-            (time.minute() * 600000) + 
-            (time.second() * 10000) +
-            (time.nanosecond() / 100000)    
+            time.hour() * 36000000 + 
+            time.minute() * 600000 + 
+            time.second() * 10000 +
+            time.nanosecond() / 100000  
         ) / 864;
         let (beat, millibeat) = total_subbeats.div_rem(&1000);
         SwatchInternetTime {
@@ -54,13 +54,13 @@ mod tests {
     use super::SwatchInternetTime;
 
     #[test]
-    fn twenty_UTC_is_875() {
+    fn twenty_utc_is_beat_875() {
         let twenty: SwatchInternetTime = Utc.ymd(1970, 1, 1).and_hms(20, 0, 0).into();
         assert_eq!(twenty.beat, 875);
     }
 
     #[test]
-    fn beat875_is_21BMT() {
+    fn beat_875_is_21_bmt() {
         let twenty: SwatchInternetTime = Utc.ymd(1970, 1, 1).and_hms(20, 0, 0).into();
         let utc: NaiveTime = twenty.into();
         assert_eq!(utc.hour(), 21);
@@ -69,7 +69,7 @@ mod tests {
     }
 
     #[test]
-    fn midnight_BMT_is_0() {
+    fn midnight_bmt_is_0() {
         let midnight: SwatchInternetTime = Utc.ymd(1970, 1, 1).and_hms(23, 0, 0).into();
         assert_eq!(midnight.beat, 0);
     }
