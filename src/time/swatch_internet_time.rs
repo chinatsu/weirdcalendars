@@ -5,7 +5,8 @@ use super::Time;
 
 #[derive(Debug)]
 pub struct SwatchInternetTime {
-    beat: u32
+    beat: u32,
+    millibeat: u32
 }
 
 impl Time<SwatchInternetTime> for SwatchInternetTime {
@@ -18,26 +19,31 @@ impl Time<SwatchInternetTime> for SwatchInternetTime {
 impl From<DateTime<Utc>> for SwatchInternetTime {
     fn from(dt: DateTime<Utc>) -> Self {
         let time = dt.with_timezone(&FixedOffset::east(3600)).time();
-        let beat = (((time.minute() * 60) as f64 + (time.hour() * 3600) as f64 + time.second() as f64) / 86.4).floor() as u32;
+        let total_subbeats = (
+            (time.hour() * 36000000) + 
+            (time.minute() * 600000) + 
+            (time.second() * 10000) +
+            (time.nanosecond() / 100000)    
+        ) / 864;
+        let (beat, millibeat) = total_subbeats.div_rem(&1000);
         SwatchInternetTime {
-            beat
+            beat,
+            millibeat
         }
     }
 }
 
 impl From<SwatchInternetTime> for NaiveTime {
     fn from(beat: SwatchInternetTime) -> Self {
-        let total_seconds = (beat.beat as f64 * 86.4).ceil() as u32;
-        println!("{}", total_seconds);
-        let (prelim_minutes, second) = total_seconds.div_rem(&60);
-        let (hour, minute) = prelim_minutes.div_rem(&60);
-        NaiveTime::from_hms(hour as u32, minute as u32, second as u32)
+        let total_subseconds = beat.beat * 864000 + beat.millibeat * 864;
+        let (second, millisecond) = total_subseconds.div_rem(&10000); 
+        NaiveTime::from_num_seconds_from_midnight(second, millisecond*100000)
     }
 }
 
 impl fmt::Display for SwatchInternetTime {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "@{:03}", self.beat)
+        write!(f, "@{:03}.{:03}", self.beat, self.millibeat)
     }
 }
 
